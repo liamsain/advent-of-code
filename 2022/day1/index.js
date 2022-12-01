@@ -1,3 +1,31 @@
+function getMostCalorificElfCalories(input) {
+  let highestTotal = 0;
+  input.split('\n\n').forEach(elfFoodCalorieGroup => {
+    let currentTotal = 0;
+    elfFoodCalorieGroup.split('\n').forEach(elfCalories => {
+      currentTotal += Number(elfCalories);
+    });
+    if (currentTotal > highestTotal) {
+      highestTotal = currentTotal;
+    }
+    currentTotal = 0;
+  });
+  return highestTotal
+}
+
+function getTopThreeCalorificElfCalories(input) {
+  let elfCalories = [];
+  input.split('\n\n').forEach(elfFoodCalorieGroup => {
+    let currentTotal = 0;
+    elfFoodCalorieGroup.split('\n').forEach(elfCalories => {
+      currentTotal += Number(elfCalories);
+    });
+    elfCalories.push(currentTotal);
+    currentTotal = 0;
+  });
+  elfCalories.sort((a, b) => b - a);
+  return elfCalories[0] + elfCalories[1] + elfCalories[2];
+}
 const input = `4035
 10596
 17891
@@ -2254,36 +2282,11 @@ const input = `4035
 2281
 1895`;
 
-function getMostCalorificElfCalories(input) {
-  let highestTotal = 0;
-  input.split('\n\n').forEach(elfFoodCalorieGroup => {
-    let currentTotal = 0;
-    elfFoodCalorieGroup.split('\n').forEach(elfCalories => {
-      currentTotal += Number(elfCalories);
-    });
-    if (currentTotal > highestTotal) {
-      highestTotal = currentTotal;
-    }
-    currentTotal = 0;
-  });
-  return highestTotal
-}
+
 
 const result = getMostCalorificElfCalories(input);
 console.log(result);
 
-function getTopThreeCalorificElfCalories(input) {
-  let elfCalories = [];
-  input.split('\n\n').forEach(elfFoodCalorieGroup => {
-    let currentTotal = 0;
-    elfFoodCalorieGroup.split('\n').forEach(elfCalories => {
-      currentTotal += Number(elfCalories);
-    });
-    elfCalories.push(currentTotal);
-    currentTotal = 0;
-  });
-  elfCalories.sort((a, b) => b - a);
-  return elfCalories[0] + elfCalories[1] + elfCalories[2];
-}
+
 const topThreeResult = getTopThreeCalorificElfCalories(input);
 console.log(topThreeResult);
