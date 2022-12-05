@@ -526,10 +526,8 @@ const stacks = [
   'rcqfslv'
 ].map(x => x.split(''));
 
-  console.log(stacks.map(x => x.join('')))
 instructions.forEach(ins => {
   splitIns = ins.split(' ');
-  console.log(ins);
   const amountToMove = Number(splitIns[1]);
   const moveFrom = Number(splitIns[3]) - 1;
   const moveTo = Number(splitIns[5]) - 1;
@@ -540,11 +538,9 @@ instructions.forEach(ins => {
   */
   const moveFromLength = stacks[moveFrom].length;
   stacks[moveTo] = [...stacks[moveTo], ...stacks[moveFrom].splice(moveFromLength - amountToMove, amountToMove)]
-  console.log(stacks.map(x => x.join('')))
 });
 
 const topOfEachStack = stacks
   .map(stack => stack[stack.length - 1].toUpperCase())
   .join('')
 console.log(topOfEachStack)
-// not TQCCPPHLS
