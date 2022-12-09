@@ -99,38 +99,67 @@ const input = `20200231332244344333341320521414032002545031636450414126412311430
 301302243133113000115553304435551505352615146115031661551161050412521420141400134222424010304012133`
 
 let visible = 0;
+let highestScenicScore = 0;
 const firstNumIsHighest = arr => {
-	if (arr.length === 1) {
-		return true;
-	}
 	const firstNum = Number(arr[0]);
 	return arr.slice(1).every(n => firstNum > Number(n));
 }
 
+const getScenicScore = (arr, log) => {
+	let score = 0;
+	const firstNum = Number(arr[0]);
+	const remainingArr = arr.slice(1);
+	for (let el of remainingArr) {
+		if (firstNum > el) {
+			score += 1;
+
+		}
+		if (firstNum <= el) {
+			score += 1;
+			break;
+		}
+	}
+
+	return score;
+};
+console.log(getScenicScore([5,3,3]));
+let input2 = `30373
+25512
+65332
+33549
+35390`;
 let lines = input.split('\n');
+// console.time('func');
 for (let rowIndex = 0; rowIndex < lines.length;rowIndex++) {
-
 	const line = lines[rowIndex];
-
 	for (let colIndex = 0; colIndex < lines[rowIndex].length;colIndex++) {
 		const left = line.substring(0, colIndex + 1).split('').map(x => Number(x));
-
-		const leftVisible = firstNumIsHighest(left.reverse());
+		const leftReversed = [...left].reverse();
+		const leftVisible = firstNumIsHighest(leftReversed);
+		const leftScore = getScenicScore(leftReversed);
 	
 		const right = line.substring(colIndex, line.length).split('').map(x => Number(x));
 		const rightVisible = firstNumIsHighest(right);
+		const rightScore = getScenicScore(right);
 
 		let down = [];
 		for (let i = rowIndex; i < lines.length;i++) {
 			down.push(Number(lines[i][colIndex]));
 		}
 		const downVisible = firstNumIsHighest(down);
+		const downScore = getScenicScore(down);
 
 		let up = [];
 		for (let i = rowIndex; i >= 0;i--) {
 			up.push(Number(lines[i][colIndex]));
 		}
 		const upVisible = firstNumIsHighest(up);
+		const upScore = getScenicScore(up);
+
+		const totalScenicScore = leftScore * rightScore * downScore * upScore;
+		if (totalScenicScore > highestScenicScore) {
+			highestScenicScore = totalScenicScore;
+		}
 
 
 		if (leftVisible || rightVisible || downVisible || upVisible) {
@@ -138,6 +167,8 @@ for (let rowIndex = 0; rowIndex < lines.length;rowIndex++) {
 		}
 	}
 }
+// console.timeEnd('func');
 
 console.log('Visible: ', visible);
-// 1669
+console.log('Highest scenic score: ', highestScenicScore);
+// 96096 scenic score too low
