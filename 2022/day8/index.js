@@ -116,11 +116,7 @@ for (let rowIndex = 0; rowIndex < lines.length;rowIndex++) {
 		const left = line.substring(0, colIndex + 1).split('').map(x => Number(x));
 
 		const leftVisible = firstNumIsHighest(left.reverse());
-		if (leftVisible) {
-			visible += 1;
-			continue;
-		}
-
+	
 		const right = line.substring(colIndex, line.length).split('').map(x => Number(x));
 		const rightVisible = firstNumIsHighest(right);
 
