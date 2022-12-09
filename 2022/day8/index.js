@@ -106,13 +106,6 @@ const firstNumIsHighest = arr => {
 	const firstNum = Number(arr[0]);
 	return arr.slice(1).every(n => firstNum > Number(n));
 }
-const lastNumIsHighest = arr => {
-	if (arr.length === 1) {
-		return true;
-	}
-	const lastNum = Number(arr[arr.length - 1]);
-	return arr.slice(0, arr.length - 1).every(n => lastNum > Number(n));
-}
 
 let lines = input.split('\n');
 for (let rowIndex = 0; rowIndex < lines.length;rowIndex++) {
@@ -122,7 +115,11 @@ for (let rowIndex = 0; rowIndex < lines.length;rowIndex++) {
 	for (let colIndex = 0; colIndex < lines[rowIndex].length;colIndex++) {
 		const left = line.substring(0, colIndex + 1).split('').map(x => Number(x));
 
-		const leftVisible = lastNumIsHighest(left);
+		const leftVisible = firstNumIsHighest(left.reverse());
+		if (leftVisible) {
+			visible += 1;
+			continue;
+		}
 
 		const right = line.substring(colIndex, line.length).split('').map(x => Number(x));
 		const rightVisible = firstNumIsHighest(right);
@@ -147,6 +144,4 @@ for (let rowIndex = 0; rowIndex < lines.length;rowIndex++) {
 }
 
 console.log('Visible: ', visible);
-// 1758 too high
-// 1757 too high
-// 1645 too low
+// 1669
