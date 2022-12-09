@@ -2012,7 +2012,7 @@ const hPos = [0, 0];
 const tPos = [0, 0]
 const tPositions = [0, 0]; 
 const splitInput = testInput.split('\n');
-const moveCoord => (coord, direction) => {
+const moveCoord = (coord, direction) => {
 	if (direction == 'R') {
 		coord[0] += 1;
 	} else if (direction == 'L') {
@@ -2025,7 +2025,7 @@ const moveCoord => (coord, direction) => {
 
 };
 for (let commandIndex = 0; commandIndex < splitInput.length; commandIndex++) {
-	const row = splitInput[i]
+	const row = splitInput[commandIndex]
 	const direction = row[0];
 	const amount = row.split(' ')[1];
 	for (let i =0; i < amount; i++) {

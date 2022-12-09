@@ -110,26 +110,14 @@ const getScenicScore = (arr, log) => {
 	const firstNum = Number(arr[0]);
 	const remainingArr = arr.slice(1);
 	for (let el of remainingArr) {
-		if (firstNum > el) {
-			score += 1;
-
-		}
+		score += 1;
 		if (firstNum <= el) {
-			score += 1;
 			break;
 		}
 	}
-
 	return score;
 };
-console.log(getScenicScore([5,3,3]));
-let input2 = `30373
-25512
-65332
-33549
-35390`;
 let lines = input.split('\n');
-// console.time('func');
 for (let rowIndex = 0; rowIndex < lines.length;rowIndex++) {
 	const line = lines[rowIndex];
 	for (let colIndex = 0; colIndex < lines[rowIndex].length;colIndex++) {
@@ -161,14 +149,11 @@ for (let rowIndex = 0; rowIndex < lines.length;rowIndex++) {
 			highestScenicScore = totalScenicScore;
 		}
 
-
 		if (leftVisible || rightVisible || downVisible || upVisible) {
 			visible += 1;
 		}
 	}
 }
-// console.timeEnd('func');
 
 console.log('Visible: ', visible);
 console.log('Highest scenic score: ', highestScenicScore);
-// 96096 scenic score too low
