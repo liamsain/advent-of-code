@@ -986,14 +986,14 @@ $ ls
 142652 bhgwj`
 
 
-const dirs = {
+let root = {
   name: '/',
   dirs: [],
   parentDir: null,
   files: [],
   size: 0
 };
-let currentDir = dirs;
+let currentDir = root;
 
 function buildTree() {
   input.split('\n').forEach(line => {
@@ -1010,50 +1010,84 @@ function buildTree() {
     } else {
       // it's a dir
       if (lineSplit[0] == 'dir') {
-        currentDir.dirs.push({
-          name: lineSplit[1],
-          dirs: [],
-          parentDir:currentDir,
-          files: [],
-          size: 0
-        });
+	      if (!currentDir.dirs.find(x => x.name == lineSplit[1])) {
+			currentDir.dirs.push({
+			  name: lineSplit[1],
+			  dirs: [],
+			  parentDir:currentDir,
+			  files: [],
+			  size: 0
+			});
+
+	      }
       } else {
-        // it's a file
-        currentDir.files.push({
-          fileSize: Number(lineSplit[0]),
-          fileName: lineSplit[1]
-        })
-        currentDir.size += Number(lineSplit[0])
+        // it's a file!
+	      if (!currentDir.files.find(x => x.fileName == lineSplit[1])) {
+		      	const fileSize = Number(lineSplit[0]);
+			currentDir.files.push({
+			  fileSize: fileSize,
+			  fileName: lineSplit[1]
+			})
+			currentDir.size += fileSize;
+		      	updateParentDirSize(currentDir.parentDir, fileSize);
+
+	      }
       }
     }
-    /*
-    console.log(dirs);
-    console.log(line);
+	  /*
+    console.log(currentDir);
+    console.log(line, '\n====================');
     prompt('>');
     */
   });
 }
 buildTree();
-console.log(dirs);
-function readDir(dir) {
-  if (dir.dirs.length === 0) {
-    return 0;
-  }
-  return dir.dirs.forEach(d => {
-
-  });
+function updateParentDirSize(parentDir, size) {
+	if (!parentDir) {
+		return;
+	}
+	parentDir.size += size;
+	updateParentDirSize(parentDir.parentDir, size);
 }
-function getDirSize(dir) {
-  if (dir.dirs.length === 0) {
-    // already calculated size of files in dir
-    return dir.size;
-  }
-  let childFoldersSize = 0;
-  dir.dirs.forEach(d => {
-    childFoldersSize += getDirSize(d)
-  });
 
-  dir.size += childFoldersSize;
+let total = 0;
+let cutOff = 100000;
+function whatIsInTheChild(dir) {
+	if (dir.size <= cutOff) {
+		total += dir.size;
+	}
+
+	if (dir.dirs.length === 0) {
+		return;
+	}
+	dir.dirs.forEach(d => whatIsInTheChild(d))
 }
-getDirSize(dirs);
-console.log(dirs);
+// whatIsInTheChild(root);
+// console.log('answer to first q: ', total);
+
+// freespace = 10 - 7 = 3;
+// spaceNeeded = 5
+// toDelete = 5 - 3
+const freeSpace = 70000000 - root.size;
+const spaceNeeded = 30000000
+const deleteThreshold  = spaceNeeded - freeSpace;
+
+// need to delete at least this much
+// const deleteThreshold = 8381165;
+let curSize = Infinity;
+
+function searchDir(dir) {
+	if (dir.size >= deleteThreshold) {
+		console.log(dir.name, dir.size);
+		if (dir.size < curSize) {
+			curSize = dir.size;
+		}
+	}
+	if (dir.dirs.length === 0) {
+		return;
+	}
+	dir.dirs.forEach(d => searchDir(d))
+}
+searchDir(root);
+console.log('size to delete', curSize);
+// 8509877 is too high
