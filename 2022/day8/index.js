@@ -137,7 +137,7 @@ for (let rowIndex = 0; rowIndex < lines.length;rowIndex++) {
 		for (let i = rowIndex; i >= 0;i--) {
 			up.push(Number(lines[i][colIndex]));
 		}
-		const upVisible = lastNumIsHighest(up);
+		const upVisible = firstNumIsHighest(up);
 
 
 		if (leftVisible || rightVisible || downVisible || upVisible) {
