@@ -1,11 +1,3 @@
-const testInput = `R 4
-U 4
-L 3
-D 1
-R 4
-D 1
-L 5
-R 2`;
 const prompt = require('prompt-sync')({sigint: true});
 const fs = require('fs');
 let input;
@@ -22,7 +14,6 @@ let gridXRight = 0;
 let gridYTop = 0;
 let gridYBottom = 0;
 
-const origin = [0, 0];
 const hPos = [0, 0];
 const tPos = [0, 0]
 const tPositions = [[0, 0]]; 
@@ -75,7 +66,7 @@ function updateDrawnGrid() {
   grid.forEach(x => {
     console.log(x.join(''))
   })
-  // prompt('>');
+   // prompt('>');
 }
 
 console.time('fun');
@@ -84,11 +75,10 @@ for (let commandIndex = 0; commandIndex < splitInput.length; commandIndex++) {
 	const direction = row[0];
 	const amount = Number(row.split(' ')[1]);
 	for (let i =0; i < amount; i++) {
-    /*
+
     console.clear();
     console.info(`Executing: ${row}`); 
     console.info(`Next: ${splitInput[commandIndex + 1]}`); 
-    */
 
 		moveCoord(hPos, direction);
     const hx = hPos[0]
@@ -135,7 +125,7 @@ for (let commandIndex = 0; commandIndex < splitInput.length; commandIndex++) {
 
       addCoordToTPos([...tPos]);
     }
-    // updateDrawnGrid();
+     updateDrawnGrid();
 	}
 }
 function addCoordToTPos(coord) {
