@@ -8,15 +8,16 @@ try {
 }
 const splitInput = input.split('\n');
 
-const gridBoundaries = [0, 0];
 let gridXLeft = 0;
 let gridXRight = 0;
 let gridYTop = 0;
 let gridYBottom = 0;
 
-const hPos = [0, 0];
-const tPos = [0, 0]
 const tPositions = [[0, 0]]; 
+const rope = new Array(10).fill(0).map((x, i) => ({
+  ch: i == 0 ? 'H' : i.toString(),
+  coord: [0, 0]
+}))
 
 const moveCoord = (coord, direction) => {
 	if (direction == 'R') {
@@ -32,64 +33,54 @@ const moveCoord = (coord, direction) => {
 
 // for debugging
 function updateDrawnGrid() {
-  if (hPos[0] > gridXRight) {
-    gridXRight = hPos[0];
-  } else if (hPos[0] < gridXLeft) {
-    gridXLeft = hPos[0];
+
+  // expand the grid if pos of head exceeds it
+  const head = rope[0].coord
+  if (head[0] > gridXRight) {
+    gridXRight = head[0];
+  } else if (head[0] < gridXLeft) {
+    gridXLeft = head[0];
   }
-  if (hPos[1] > gridYTop) {
-    gridYTop = hPos[1];
-  } else if (hPos[1] < gridYBottom) {
-    gridYBottom = hPos[1];
+  if (head[1] > gridYTop) {
+    gridYTop = head[1];
+  } else if (head[1] < gridYBottom) {
+    gridYBottom = head[1];
   }
+
   const grid = [];
   for (let row = gridYTop; row >= gridYBottom; row--) {
     let line = [];
     for (let col = gridXLeft; col <= gridXRight; col++) {
-      const hAndTMatch = hPos[0] == tPos[0] && hPos[1] == tPos[1];
-      if (hPos[0] == col && hPos[1] == row) {
-        line.push('H ');
-        continue;
-      }
-      if (tPos[0] == col && tPos[1] == row) {
-        if (!hAndTMatch) {
-          line.push('T ');
-          continue;
+      let toPush = '. ';
+      for (let i = rope.length - 1; i >= 0;i--) {
+        if (rope[i].coord[0] == col && rope[i].coord[1] == row) {
+          toPush = `${rope[i].ch} `;
         }
       }
-      line.push('. ');
+      line.push(toPush);
     }
     grid.push([...line]);
     line = [];
   }
-  // draw it
   grid.forEach(x => {
     console.log(x.join(''))
   })
-   // prompt('>');
+    prompt('>');
 }
 
 console.time('fun');
-for (let commandIndex = 0; commandIndex < splitInput.length; commandIndex++) {
-	const row = splitInput[commandIndex]
-	const direction = row[0];
-	const amount = Number(row.split(' ')[1]);
-	for (let i =0; i < amount; i++) {
-
-    console.clear();
-    console.info(`Executing: ${row}`); 
-    console.info(`Next: ${splitInput[commandIndex + 1]}`); 
-
-		moveCoord(hPos, direction);
-    const hx = hPos[0]
-    const hy = hPos[1];
-    const tx = tPos[0];
-    const ty = tPos[1];
+function moveFollower(follower, leader) {
+    let moved = false;
+    const hx = leader[0]
+    const hy = leader[1];
+    const tx = follower[0];
+    const ty = follower[1];
     const xDiff = hx - tx;
     const yDiff = hy - ty;
     const tMustMove = xDiff > 1 || xDiff < -1 || yDiff > 1 || yDiff < -1;
 
     if (tMustMove) {
+      moved = true;
       const hIsSameLineRight = hx > tx && hy == ty;
       const hIsSameLineLeft = hx < tx && hy == ty;
       const hIsDiagUpRight = hx > tx && hy > ty;
@@ -100,32 +91,55 @@ for (let commandIndex = 0; commandIndex < splitInput.length; commandIndex++) {
       const hIsSameColUp = hy > ty && hx == tx;
 
       if (hIsSameLineRight) {
-        tPos[0] += 1;
+        follower[0] += 1;
       } else if (hIsSameLineLeft) {
-        tPos[0] -= 1;
+        follower[0] -= 1;
       } else if (hIsDiagUpRight) {
-        tPos[0] += 1;
-        tPos[1] += 1;
+        follower[0] += 1;
+        follower[1] += 1;
       } else if (hIsDiagUpLeft) {
-        tPos[0] -= 1;
-        tPos[1] += 1;
+        follower[0] -= 1;
+        follower[1] += 1;
       } else if (hIsDiagDownRight) {
-        tPos[0] += 1;
-        tPos[1] -= 1;
+        follower[0] += 1;
+        follower[1] -= 1;
       } else if (hIsDiagDownLeft) {
-        tPos[0] -= 1;
-        tPos[1] -= 1;
+        follower[0] -= 1;
+        follower[1] -= 1;
       } else if (hIsSameColDown) {
-        tPos[1] -= 1;
+        follower[1] -= 1;
       } else if (hIsSameColUp) {
-        tPos[1] += 1;
+        follower[1] += 1;
       } else {
         console.error("you didn't account for this case you silly billy");
       }
 
-      addCoordToTPos([...tPos]);
     }
-     updateDrawnGrid();
+  return moved;
+
+}
+for (let commandIndex = 0; commandIndex < splitInput.length; commandIndex++) {
+	const row = splitInput[commandIndex]
+	const direction = row[0];
+	const amount = Number(row.split(' ')[1]);
+	for (let i =0; i < amount; i++) {
+    for (let ropeI = 0; ropeI < rope.length; ropeI++) {
+      debugger;
+      if (ropeI == 0) {
+        moveCoord(rope[0].coord, direction);
+      } else {
+        const tailMoved = moveFollower(rope[ropeI].coord, rope[ropeI - 1].coord);
+        if (tailMoved && ropeI == rope.length - 1) {
+          addCoordToTPos([...rope[ropeI].coord]);
+        }
+      }
+    }
+    /*
+    console.clear();
+    console.info(`Executing: ${row}`); 
+    console.info(`Next: ${splitInput[commandIndex + 1]}`); 
+    updateDrawnGrid();
+    */
 	}
 }
 function addCoordToTPos(coord) {
