@@ -2,7 +2,7 @@ const fs = require('fs');
 
 let input;
 try {
-  input = fs.readFileSync('./testInput.txt', 'utf8');
+  input = fs.readFileSync('./input.txt', 'utf8');
 } catch(err) {
   console.error(err);
 }
@@ -27,11 +27,11 @@ for (let i = 0; i < splitInput.length;i++) {
     cycleNumberCheck();
     cycleNumber += 1;
     regVal = regVal + Number(operand);
-    cycleNumberCheck();
   }  else {
     cycleNumber += 1;
   }
 }
 console.timeEnd('fun');
 // test answer is 13140
+const testAnswer = 13140;
 console.log('signal strength sum: ', signalStrengthsSum);
