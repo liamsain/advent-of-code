@@ -56,7 +56,7 @@ function doIt(currentCoord, currentSteps, prevDir) {
       steps.push(currentSteps + 1);
       return;
     }
-    if (leftChar && (leftChar.charCodeAt() - 1 == currentCharCode || leftChar.charCodeAt() == currentCharCode || currentChar == 'S')) {
+    if (leftChar && (leftChar.charCodeAt() - 1 == currentCharCode || leftChar.charCodeAt() <= currentCharCode || currentChar == 'S')) {
       doIt(left, currentSteps + 1, 'left')
     }
   }
@@ -69,7 +69,7 @@ function doIt(currentCoord, currentSteps, prevDir) {
       steps.push(currentSteps + 1);
       return;
     }
-    if (upChar && (upChar.charCodeAt() -1 == currentCharCode || upChar.charCodeAt() == currentCharCode || currentChar == 'S')) {
+    if (upChar && (upChar.charCodeAt() -1 == currentCharCode || upChar.charCodeAt() <= currentCharCode || currentChar == 'S')) {
       doIt(up, currentSteps + 1, 'up');
     }
   }
@@ -82,7 +82,7 @@ function doIt(currentCoord, currentSteps, prevDir) {
       steps.push(currentSteps + 1);
       return;
     }
-    if (rightChar && (rightChar.charCodeAt() - 1 == currentCharCode || rightChar.charCodeAt() == currentCharCode || currentChar == 'S')) {
+    if (rightChar && (rightChar.charCodeAt() - 1 == currentCharCode || rightChar.charCodeAt() <= currentCharCode || currentChar == 'S')) {
       doIt(right, currentSteps + 1, 'right');
     }
   }
@@ -95,7 +95,7 @@ function doIt(currentCoord, currentSteps, prevDir) {
       steps.push(currentSteps + 1);
       return;
     }
-    if (downChar && (downChar.charCodeAt() - 1 == currentCharCode || downChar.charCodeAt() == currentCharCode || currentChar == 'S')) {
+    if (downChar && (downChar.charCodeAt() - 1 == currentCharCode || downChar.charCodeAt() <= currentCharCode || currentChar == 'S')) {
       doIt(down, currentSteps + 1, 'down');
     }
   }
