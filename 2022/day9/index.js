@@ -6,6 +6,7 @@ try {
 } catch (err) {
   console.error(err);
 }
+
 const splitInput = input.split('\n');
 
 let gridXLeft = 0;
@@ -68,7 +69,7 @@ function updateDrawnGrid() {
     prompt('>');
 }
 
-console.time('fun');
+console.time('execution');
 function moveFollower(follower, leader) {
     let moved = false;
     const hx = leader[0]
@@ -151,5 +152,5 @@ function addCoordToTPos(coord) {
 
 console.log('unique tail positions count:', tPositions.length);
 
-console.timeEnd('fun');
+console.timeEnd('execution');
 
