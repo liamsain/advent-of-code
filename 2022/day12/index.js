@@ -1,106 +1,194 @@
 const fs = require('fs');
+const prompt = require('prompt-sync')({ sigint: true });
 let input;
 try {
-  input = fs.readFileSync('./testInput.txt', 'utf8')
-} catch(err) {
-  throw(err);
+  input = fs.readFileSync('./input.txt', 'utf8')
+} catch (err) {
+  throw (err);
 }
 const endCharCode = "E".charCodeAt();
 const splitInput = input.split('\n');
 const grid = [];
+let gridWidth = 0;
+let gridLength = 0;
 let startCoord = [0, 0];
 let endCoord = [];
+const stepsToEnd = [];
 
-input.split('\r\n').forEach(l => grid.push(l.split('')))
-
-grid.forEach((row, rowI) => {
-  const startIndex = row.findIndex(x => x == 'S');
-  if (startIndex > -1) {
-    startCoord = [rowI, startIndex]
-  }
-  const endIndex = row.findIndex(x => x =='E');
-  if (endIndex > -1) {
-    endCoord = [rowI, endIndex]
-  }
+input.split('\r\n').forEach((line, lineIndex) => {
+  const row = [];
+  line.split('').forEach((ch, chIndex) => {
+    const node = {
+      ch,
+      charCode: ch.charCodeAt(),
+      x: chIndex,
+      y: lineIndex,
+      visited: false,
+      isEnd: ch == 'E',
+      isStart: ch == 'S',
+    };
+    row.push(node);
+  });
+  grid.push(row);
 });
+gridLength = grid.length;
+gridWidth = grid[0].length;
 
-const steps = [];
-function doIt(currentCoord, currentSteps, prevDir) {
-  // return when you cannot go left, up, right, down || you are at S
-  /*
-  const fallenOutsideGrid = currentCoord[0] < 0 || currentCoord[0] > grid[0].length - 1 ||  currentCoord[1] < 0 || currentCoord[1] > grid.length - 1;
-  if (fallenOutsideGrid) {
-    return;
+function drawGridWithYouAreHere(currentNode, steps) {
+  console.clear();
+  let xStart = 0;
+  let xEnd = 0;
+  let yStart = 0;
+  let yEnd = 0;
+  if (currentNode.x > 20) {
+    xStart = currentNode.x - 20;
   }
-  */
-
-
-  // grid[row(y)][col(x)]
-  // coord[x(col), y(row)]
-  const column = currentCoord[0];
-  const row = currentCoord[1];
-
-  const currentChar = grid[row][column];
-  const currentCharCode = currentChar.charCodeAt();
-
-  // if moved left to get here, don't go right
-  // if moved right to get here, don't get left
-  // if moved down to get here, don't go up
-  // if moved up to get here, don't go down
-  
-  //  left
-  if (prevDir !== 'right' && column - 1 > -1) {
-    let left = [currentCoord[0] - 1, currentCoord[1]];
-    let leftChar = grid[row][column - 1];
-    if (leftChar == 'E') {
-      steps.push(currentSteps + 1);
-      return;
-    }
-    if (leftChar && (leftChar.charCodeAt() - 1 == currentCharCode || leftChar.charCodeAt() <= currentCharCode || currentChar == 'S')) {
-      doIt(left, currentSteps + 1, 'left')
-    }
+  if (currentNode.x + 30 < grid[0].length) {
+    xEnd = currentNode.x + 30;
+  } else {
+    xEnd = grid[0].length
+  }
+  if (currentNode.y > 20) {
+    yStart = currentNode.y - 20;
+  }
+  if (currentNode.y + 20 < grid.length) {
+    yEnd = currentNode.y + 20;
+  } else {
+    yEnd = grid.length;
   }
 
-  // up
-  if (prevDir !== 'down' && row - 1 > -1) {
-    let up = [currentCoord[0], currentCoord[1] - 1];
-    let upChar = grid[row - 1][column];
-    if (upChar == 'E') {
-      steps.push(currentSteps + 1);
-      return;
+  grid.forEach((row, rowIndex) => {
+    if (rowIndex >= yStart && rowIndex <= yEnd) {
+      const rowLine = row.map(n => ({ ...n })).slice(xStart, xEnd);
+      if (rowIndex == currentNode.y) {
+        const currentPos = rowLine.find(n => n.x == currentNode.x);
+        if (currentPos) {
+          currentPos.ch = '\u2588';
+        }
+      }
+      console.log(rowLine.map(n => {
+        if (n.x == currentNode.x && n.y == currentNode.y) {
+          return 'H'
+        } 
+        if (n.charCode > currentNode.charCode + 1) {
+          return '\u2588'
+        }
+        if (n.charCode == currentNode.charCode + 1) {
+          return '\u259F'
+        }
+        if (n.charCode == currentNode.charCode) {
+          // return '\u2591';
+          return ' '
+        }
+        return '\u2593';
+      }).join(' '));
     }
-    if (upChar && (upChar.charCodeAt() -1 == currentCharCode || upChar.charCodeAt() <= currentCharCode || currentChar == 'S')) {
-      doIt(up, currentSteps + 1, 'up');
-    }
-  }
-
-  // right
-  if (prevDir !== 'left' && column + 1 <= grid[0].length - 1) {
-    let right = [currentCoord[0] + 1, currentCoord[1]];
-    let rightChar = grid[row][column + 1];
-    if (rightChar == 'E') {
-      steps.push(currentSteps + 1);
-      return;
-    }
-    if (rightChar && (rightChar.charCodeAt() - 1 == currentCharCode || rightChar.charCodeAt() <= currentCharCode || currentChar == 'S')) {
-      doIt(right, currentSteps + 1, 'right');
-    }
-  }
-
-  // down
-  if (prevDir !== 'up' && row + 1 <= grid.length) {
-    let down = [currentCoord[0], currentCoord[1] + 1];
-    let downChar = grid[row + 1][column];
-    if (downChar == 'E') {
-      steps.push(currentSteps + 1);
-      return;
-    }
-    if (downChar && (downChar.charCodeAt() - 1 == currentCharCode || downChar.charCodeAt() <= currentCharCode || currentChar == 'S')) {
-      doIt(down, currentSteps + 1, 'down');
-    }
-  }
+  });
+  console.log('steps', steps);
+  prompt('>');
 }
 
-doIt(startCoord, 0, null)
-console.log(steps);
+function pathFind(currentNode, currentSteps, cameFrom) {
+  drawGridWithYouAreHere(currentNode, currentSteps);
 
+  // if cameFrom right, don't go left
+  if (currentNode.visited) {
+    return;
+  }
+  if (currentNode.isEnd) {
+    stepsToEnd.push(currentSteps + 1);
+    return;
+  }
+  currentNode.visited = true;
+  // priority: if currently z, look for end
+  // else, try and step up
+  // else, try and go lower
+  const stepUps = [];
+  const sameLevelSteps = [];
+  const lowerSteps = [];
+  let end;
+  let rightNode;
+  let downNode;
+  let leftNode;
+  let upNode;
+
+  const processNode = node => {
+    if (currentNode.ch == 'z') {
+      if (node.isEnd) {
+        end = node;
+      }
+    }
+    if (node.charCode == currentNode.charCode + 1 || currentNode.isStart) {
+      stepUps.push(node);
+    } else if (node.charCode == currentNode.charCode) {
+      sameLevelSteps.push(node);
+    } else if (node.charNode < currentNode.charCode) {
+      lowerSteps.push(node);
+    }
+  };
+  const canGoRight = currentNode.x + 1 <= gridWidth - 1;
+  if (canGoRight) {
+    rightNode = grid[currentNode.y][currentNode.x + 1];
+    processNode(rightNode);
+  }
+  const canGoDown = currentNode.y + 1 <= gridLength - 1;
+  if (canGoDown) {
+    downNode = grid[currentNode.y + 1][currentNode.x];
+    processNode(downNode);
+  }
+  const canGoLeft = currentNode.x - 1 >= 0;
+  if (canGoLeft) {
+    leftNode = grid[currentNode.y][currentNode.x - 1];
+    processNode(leftNode);
+  }
+  const canGoUp = currentNode.y - 1 >= 0;
+  if (canGoUp) {
+    upNode = grid[currentNode.y - 1][currentNode.x];
+    processNode(upNode);
+  }
+
+  if (end) {
+    pathFind(end, currentSteps + 1);
+  }
+  if (stepUps.length) {
+    stepUps.forEach(n => pathFind(n, currentSteps + 1));
+  }
+  if (lowerSteps.length) {
+    lowerSteps.forEach(n => pathFind(n, currentSteps + 1));
+  }
+
+  if (sameLevelSteps.length) {
+    sameLevelSteps.forEach(n => pathFind(n, currentSteps + 1));
+  }
+
+  // // lookRight
+  // if (canGoRight && cameFrom !== 'left') {
+  //   if (rightNode.charCode - 1 <= currentNode.charCode || currentNode.isStart) {
+  //     pathFind(rightNode, currentSteps + 1, 'right');
+  //   }
+  // }
+
+  // // look down
+  // if (canGoDown && cameFrom !== 'up') {
+  //   if (downNode.charCode - 1 <= currentNode.charCode || currentNode.isStart) {
+  //     pathFind(downNode, currentSteps + 1, 'down');
+  //   }
+  // }
+
+  // // look left
+  // if (canGoLeft && cameFrom !== 'right') {
+  //   if (leftNode.charCode - 1 <= currentNode.charCode || currentNode.isStart) {
+  //     pathFind(leftNode, currentSteps + 1, 'left');
+  //   }
+  // }
+
+  // // up
+  // if (canGoUp && cameFrom !== 'down') {
+  //   if (upNode.charCode - 1 <= currentNode.charCode || currentNode.isStart) {
+  //     pathFind(upNode, currentSteps + 1, 'up');
+  //   }
+  // }
+
+}
+pathFind(grid[0][0], 0);
+console.log(stepsToEnd);
